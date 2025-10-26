@@ -1,0 +1,267 @@
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --font-size: 16px;
+  --background: #faf9f7;
+  --foreground: #2d2a26;
+  --card: #ffffff;
+  --card-foreground: #2d2a26;
+  --popover: #ffffff;
+  --popover-foreground: #2d2a26;
+  --primary: #d2691e;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f4f2;
+  --secondary-foreground: #2d2a26;
+  --muted: #f5f4f2;
+  --muted-foreground: #8b8680;
+  --accent: #e8e6e1;
+  --accent-foreground: #2d2a26;
+  --destructive: #dc3545;
+  --destructive-foreground: #ffffff;
+  --border: rgba(45, 42, 38, 0.08);
+  --input: transparent;
+  --ring: #d2691e;
+  --chart-1: #d2691e;
+  --chart-2: #8fbc8f;
+  --chart-3: #deb887;
+  --chart-4: #f4a460;
+  --chart-5: #cd853f;
+  --radius: 0.75rem;
+  
+  /* Restaurant-specific colors */
+  --status-available: #8fbc8f;
+  --status-unavailable: #dc3545;
+  --status-preparing: #ffa500;
+  --status-occupied: #d2691e;
+  --status-reserved: #4682b4;
+  --status-cleaning: #9370db;
+  
+  /* Text size utilities */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+}
+
+.dark {
+  --background: #1a1714;
+  --foreground: #f5f4f2;
+  --card: #2d2a26;
+  --card-foreground: #f5f4f2;
+  --popover: #2d2a26;
+  --popover-foreground: #f5f4f2;
+  --primary: #ff8c42;
+  --primary-foreground: #1a1714;
+  --secondary: #3a3530;
+  --secondary-foreground: #f5f4f2;
+  --muted: #3a3530;
+  --muted-foreground: #a39e97;
+  --accent: #3a3530;
+  --accent-foreground: #f5f4f2;
+  --destructive: #ff4757;
+  --destructive-foreground: #f5f4f2;
+  --border: rgba(245, 244, 242, 0.1);
+  --input: #3a3530;
+  --ring: #ff8c42;
+  --chart-1: #ff8c42;
+  --chart-2: #7ed321;
+  --chart-3: #f5a623;
+  --chart-4: #bd10e0;
+  --chart-5: #50e3c2;
+  
+  /* Restaurant-specific colors - dark mode */
+  --status-available: #7ed321;
+  --status-unavailable: #ff4757;
+  --status-preparing: #f5a623;
+  --status-occupied: #ff8c42;
+  --status-reserved: #5ac8fa;
+  --status-cleaning: #bd10e0;
+}
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius: var(--radius);
+  
+  /* Text size utilities */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/**
+ * Base typography. This is not applied to elements which have an ancestor with a Tailwind text class.
+ */
+@layer base {
+  :where(:not(:has([class*=" text-"]), :not(:has([class^="text-"])))) {
+    h1 {
+      font-size: var(--text-2xl);
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    h2 {
+      font-size: var(--text-xl);
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    h3 {
+      font-size: var(--text-lg);
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    h4 {
+      font-size: var(--text-base);
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    p {
+      font-size: var(--text-base);
+      font-weight: 400;
+      line-height: 1.5;
+    }
+
+    label {
+      font-size: var(--text-base);
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    button {
+      font-size: var(--text-base);
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    input {
+      font-size: var(--text-base);
+      font-weight: 400;
+      line-height: 1.5;
+    }
+  }
+}
+
+html {
+  font-size: var(--font-size);
+}
+
+/* Toast Notifications Styling */
+[data-sonner-toast] {
+  background-color: var(--card) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--card-foreground) !important;
+}
+
+[data-sonner-toast] [data-title] {
+  color: var(--card-foreground) !important;
+  font-weight: 500;
+}
+
+[data-sonner-toast] [data-description] {
+  color: var(--muted-foreground) !important;
+}
+
+[data-sonner-toast][data-type="success"] {
+  background-color: var(--card) !important;
+  border-color: var(--status-available) !important;
+}
+
+[data-sonner-toast][data-type="success"] [data-title] {
+  color: var(--status-available) !important;
+}
+
+[data-sonner-toast][data-type="error"] {
+  background-color: var(--card) !important;
+  border-color: var(--destructive) !important;
+}
+
+[data-sonner-toast][data-type="error"] [data-title] {
+  color: var(--destructive) !important;
+}
+
+[data-sonner-toast][data-type="warning"] {
+  background-color: var(--card) !important;
+  border-color: var(--status-preparing) !important;
+}
+
+[data-sonner-toast][data-type="warning"] [data-title] {
+  color: var(--status-preparing) !important;
+}
+
+[data-sonner-toast] [data-button] {
+  background-color: var(--primary) !important;
+  color: var(--primary-foreground) !important;
+}
+
+[data-sonner-toast] [data-cancel-button] {
+  background-color: var(--muted) !important;
+  color: var(--muted-foreground) !important;
+}
+
+/* Close button styling */
+[data-sonner-toast] [data-close-button] {
+  background-color: transparent !important;
+  border: 1px solid var(--border) !important;
+  color: var(--muted-foreground) !important;
+  opacity: 0.7;
+  transition: all 0.2s ease;
+}
+
+[data-sonner-toast] [data-close-button]:hover {
+  background-color: var(--muted) !important;
+  opacity: 1;
+  border-color: var(--muted-foreground) !important;
+}
+
+[data-sonner-toast] [data-close-button] svg {
+  width: 14px !important;
+  height: 14px !important;
+}

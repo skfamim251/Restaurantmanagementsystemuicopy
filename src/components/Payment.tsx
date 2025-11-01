@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { toast } from "sonner@2.0.3";
@@ -43,7 +43,16 @@ interface SplitBill {
 }
 
 export function Payment() {
-  const { tables, settings } = useRestaurant();
+  const { 
+    tables, 
+    settings, 
+    payBill, 
+    generateBill, 
+    getTableBill,
+    updateTableStatus,
+    updateTableOrderStatus,
+    refreshTables 
+  } = useRestaurant();
   const [selectedTable, setSelectedTable] = useState<number | null>(null);
   const [paymentMethod, setPaymentMethod] = useState("card");
   const [tipPercentage, setTipPercentage] = useState(18);
@@ -53,6 +62,16 @@ export function Payment() {
   const [paymentProcessing, setPaymentProcessing] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
   const [paidBills, setPaidBills] = useState<number[]>([]);
+
+  // Auto-refresh tables when component mounts and periodically for real-time coordination
+  useEffect(() => {
+    refreshTables();
+    const interval = setInterval(() => {
+      refreshTables();
+    }, 5000); // Refresh every 5 seconds for real-time updates
+    
+    return () => clearInterval(interval);
+  }, [refreshTables]);
 
   // Get tables with orders
   const tablesWithOrders = useMemo(() => {
@@ -124,21 +143,42 @@ export function Payment() {
   };
 
   const processPayment = async () => {
-    if (!selectedBill) return;
+    if (!selectedBill || !selectedTable) return;
     
     setPaymentProcessing(true);
     
-    // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    
     try {
-      // Mark bill as paid
-      setPaidBills([...paidBills, selectedTable!]);
+      // Simulate payment processing
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Generate or get bill for this table
+      const existingBill = getTableBill(selectedTable.toString());
+      const bill = existingBill || generateBill(selectedTable.toString());
+      
+      // Process payment through restaurant context
+      payBill(bill.id, paymentMethod as any);
+      
+      // Update all orders for this table as paid
+      if (selectedBill.table.orders) {
+        for (const order of selectedBill.table.orders) {
+          await updateTableOrderStatus(order.id, 'paid');
+        }
+      }
+      
+      // Update table status to available
+      await updateTableStatus(selectedTable.toString(), 'available');
+      
+      // Refresh tables to get latest state
+      await refreshTables();
+      
+      // Mark locally as paid
+      setPaidBills([...paidBills, selectedTable]);
       
       toast.success("Payment processed successfully!");
       setShowReceipt(true);
       
     } catch (error) {
+      console.error('Payment error:', error);
       toast.error("Payment failed. Please try again.");
     } finally {
       setPaymentProcessing(false);

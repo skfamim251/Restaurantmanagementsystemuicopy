@@ -121,6 +121,19 @@ export function MenuManagement() {
   };
 
   const handleSave = async () => {
+    // Validate required fields
+    if (!formData.name || !formData.price || !formData.category) {
+      toast.error('Please fill in all required fields');
+      return;
+    }
+
+    // Confirmation dialog for editing existing items
+    if (!isCreating && selectedItem) {
+      if (!confirm('Are you sure you want to save these changes?')) {
+        return;
+      }
+    }
+
     try {
       if (isCreating) {
         const newItem = await api.createMenuItem(formData as MenuItem);

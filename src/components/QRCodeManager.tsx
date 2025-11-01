@@ -26,6 +26,7 @@ export function QRCodeManager() {
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
   const [showQRDialog, setShowQRDialog] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [generatingQR, setGeneratingQR] = useState<string | null>(null);
 
   useEffect(() => {
     loadTables();
@@ -75,29 +76,52 @@ export function QRCodeManager() {
 
   const handleGenerateQR = async (table: Table) => {
     setSelectedTable(table);
+    
+    // Check if QR already exists
+    if (qrCodes[table.id]) {
+      setShowQRDialog(true);
+      return;
+    }
+    
+    setGeneratingQR(table.id);
     const qr = await generateQRCode(table.id);
+    setGeneratingQR(null);
+    
     if (qr) {
       setShowQRDialog(true);
     }
   };
 
-  const downloadQRCode = (table: Table, qrCode: QRCode) => {
-    // Generate QR code URL
-    const baseUrl = window.location.origin;
-    const qrUrl = `${baseUrl}/order?qr=${qrCode.code}`;
-    
-    // Use a QR code generation service
-    const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(qrUrl)}`;
-    
-    // Create download link
-    const link = document.createElement('a');
-    link.href = qrImageUrl;
-    link.download = `table-${table.number}-qr.png`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    
-    toast.success('QR code downloaded');
+  const downloadQRCode = async (table: Table, qrCode: QRCode) => {
+    try {
+      // Generate QR code URL
+      const baseUrl = window.location.origin;
+      const qrUrl = `${baseUrl}/menu?table=${table.number}&qr=${qrCode.code}`;
+      
+      // Use a QR code generation service with higher quality
+      const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&format=png&data=${encodeURIComponent(qrUrl)}`;
+      
+      // Fetch the image and create a blob for download
+      const response = await fetch(qrImageUrl);
+      const blob = await response.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      
+      // Create download link
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = `RestaurantOS-Table-${table.number}-QR.png`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Clean up blob URL
+      URL.revokeObjectURL(blobUrl);
+      
+      toast.success('QR code downloaded successfully!');
+    } catch (error) {
+      console.error('Error downloading QR code:', error);
+      toast.error('Failed to download QR code');
+    }
   };
 
   if (loading) {
@@ -135,9 +159,24 @@ export function QRCodeManager() {
                       onClick={() => handleGenerateQR(table)}
                       className="flex-1 bg-terracotta hover:bg-terracotta-dark"
                       size="sm"
+                      disabled={generatingQR === table.id}
                     >
-                      <QrCode className="w-4 h-4 mr-2" />
-                      Generate QR
+                      {generatingQR === table.id ? (
+                        <>
+                          <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
+                          Generating...
+                        </>
+                      ) : qrCodes[table.id] ? (
+                        <>
+                          <QrCode className="w-4 h-4 mr-2" />
+                          View QR
+                        </>
+                      ) : (
+                        <>
+                          <QrCode className="w-4 h-4 mr-2" />
+                          Generate QR
+                        </>
+                      )}
                     </Button>
                     
                     {qrCodes[table.id] && (
@@ -167,14 +206,17 @@ export function QRCodeManager() {
             
             {selectedTable && qrCodes[selectedTable.id] && (
               <div className="space-y-4">
-                <div className="flex justify-center p-6 bg-white rounded-lg">
-                  <img
-                    src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
-                      `${window.location.origin}/order?qr=${qrCodes[selectedTable.id].code}`
-                    )}`}
-                    alt={`QR Code for Table ${selectedTable.number}`}
-                    className="w-64 h-64"
-                  />
+                <div className="flex justify-center p-6 bg-white dark:bg-gray-100 rounded-lg">
+                  <div className="w-64 h-64 flex items-center justify-center">
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
+                        `${window.location.origin}/menu?table=${selectedTable.number}&qr=${qrCodes[selectedTable.id].code}`
+                      )}`}
+                      alt={`QR Code for Table ${selectedTable.number}`}
+                      className="w-full h-full object-contain"
+                      crossOrigin="anonymous"
+                    />
+                  </div>
                 </div>
                 
                 <div className="text-center space-y-2">

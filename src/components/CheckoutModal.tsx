@@ -1,15 +1,27 @@
 import { useState, useEffect } from "react";
 import { motion } from "motion/react";
-import { X, User, Users, MapPin, CreditCard, DollarSign, Smartphone } from "lucide-react";
+import { X, User, Users, MapPin, CreditCard, DollarSign, Smartphone, MessageSquare, Plus, Minus } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+import { Textarea } from "./ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { Card } from "./ui/card";
 import { Badge } from "./ui/badge";
+import { Checkbox } from "./ui/checkbox";
+import { Separator } from "./ui/separator";
 import { useRestaurant } from "../contexts/RestaurantContext";
 import { toast } from "sonner@2.0.3";
+
+const availableExtras = [
+  { id: 'napkins', label: 'Extra Napkins', icon: '🧻' },
+  { id: 'spoons', label: 'Extra Spoons', icon: '🥄' },
+  { id: 'forks', label: 'Extra Forks', icon: '🍴' },
+  { id: 'knives', label: 'Extra Knives', icon: '🔪' },
+  { id: 'water', label: 'Water', icon: '💧' },
+  { id: 'condiments', label: 'Condiments', icon: '🧂' },
+];
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -34,6 +46,8 @@ export function CheckoutModal({ isOpen, onClose, onSuccess, preSelectedTableId, 
   const [selectedTableId, setSelectedTableId] = useState<number | null>(null);
   const [customerName, setCustomerName] = useState("");
   const [partySize, setPartySize] = useState<number>(1);
+  const [orderComment, setOrderComment] = useState("");
+  const [selectedExtras, setSelectedExtras] = useState<string[]>([]);
 
   // Update state when props change
   useEffect(() => {
@@ -68,6 +82,18 @@ export function CheckoutModal({ isOpen, onClose, onSuccess, preSelectedTableId, 
     // If customer info is pre-provided, no need to validate
     if (!preSelectedTableId && !customerName.trim()) {
       toast.error("Please enter customer name");
+      return;
+    }
+
+    // Validate party size against table capacity
+    if (selectedTable && partySize > selectedTable.capacity) {
+      toast.error(`Party size (${partySize}) exceeds table capacity (${selectedTable.capacity}). Please select a larger table.`);
+      return;
+    }
+
+    // Validate minimum party size
+    if (partySize < 1) {
+      toast.error("Party size must be at least 1");
       return;
     }
 
@@ -170,19 +196,31 @@ export function CheckoutModal({ isOpen, onClose, onSuccess, preSelectedTableId, 
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="partySize">Party Size</Label>
+                <Label htmlFor="partySize">
+                  Party Size
+                  {selectedTable && (
+                    <span className="text-xs text-muted-foreground ml-2">
+                      (Max: {selectedTable.capacity})
+                    </span>
+                  )}
+                </Label>
                 <div className="relative">
                   <Users className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="partySize"
                     type="number"
                     min="1"
-                    max="12"
+                    max={selectedTable?.capacity || 12}
                     value={partySize}
                     onChange={(e) => setPartySize(parseInt(e.target.value) || 1)}
-                    className="pl-10"
+                    className={`pl-10 ${selectedTable && partySize > selectedTable.capacity ? 'border-red-500 focus:border-red-500' : ''}`}
                   />
                 </div>
+                {selectedTable && partySize > selectedTable.capacity && (
+                  <p className="text-xs text-red-500">
+                    Party size exceeds table capacity of {selectedTable.capacity}
+                  </p>
+                )}
               </div>
             </div>
           )}

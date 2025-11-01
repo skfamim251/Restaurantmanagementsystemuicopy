@@ -310,16 +310,17 @@ export function OnboardingWizard({ onComplete }: OnboardingWizardProps) {
               </p>
             </div>
 
-            <div className="flex gap-2">
+            <div className="space-y-2">
               <Button
                 onClick={() => setCurrentStep(currentStep + 1)}
-                className="flex-1 bg-terracotta hover:bg-terracotta-dark"
+                className="w-full bg-terracotta hover:bg-terracotta-dark"
+                size="lg"
               >
-                Go to Menu Management
+                Continue to Next Step
                 <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
-              <Button onClick={handleSkipStep} variant="outline">
-                Skip for Now
+              <Button onClick={handleSkipStep} variant="outline" className="w-full">
+                Skip Menu Setup
               </Button>
             </div>
           </div>

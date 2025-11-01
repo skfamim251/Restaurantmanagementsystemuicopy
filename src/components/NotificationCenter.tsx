@@ -18,6 +18,10 @@ export function NotificationCenter() {
     unreadCount 
   } = useNotifications();
 
+  const handleClearAll = () => {
+    notifications.forEach(notification => removeNotification(notification.id));
+  };
+
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'order_update':
@@ -91,14 +95,14 @@ export function NotificationCenter() {
           )}
         </div>
 
-        <ScrollArea className="max-h-96">
+        <ScrollArea className="h-96 max-h-96">
           {notifications.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
               <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
               <p>No notifications yet</p>
             </div>
           ) : (
-            <div className="p-2">
+            <div className="p-2 space-y-2">
               <AnimatePresence>
                 {notifications.map((notification) => (
                   <motion.div
@@ -166,7 +170,7 @@ export function NotificationCenter() {
                 variant="ghost"
                 size="sm"
                 className="w-full text-xs"
-                onClick={() => notifications.forEach(n => removeNotification(n.id))}
+                onClick={handleClearAll}
               >
                 Clear all notifications
               </Button>

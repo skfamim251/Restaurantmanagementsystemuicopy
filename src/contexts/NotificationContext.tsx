@@ -87,66 +87,17 @@ export function NotificationProvider({ children }: { children: React.ReactNode }
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
-  // Simulate real-time updates based on user role
+  // Real-time updates are now triggered only by actual events
+  // Remove auto-generation of fake notifications
   useEffect(() => {
     if (!user) return;
-
-    const interval = setInterval(() => {
-      // Generate role-appropriate notifications
-      if (Math.random() < 0.1) { // 10% chance every 5 seconds
-        if (user.role === 'customer') {
-          // Customers see order status updates
-          const customerMessages = [
-            {
-              type: 'order_update' as const,
-              title: 'Order Update',
-              message: `Your order is being prepared. Estimated time: ${Math.floor(Math.random() * 15) + 5} minutes`
-            },
-            {
-              type: 'order_update' as const,
-              title: 'Order Ready',
-              message: 'Your order is ready! Please come to the counter.'
-            }
-          ];
-          
-          const randomMessage = customerMessages[Math.floor(Math.random() * customerMessages.length)];
-          addNotification(randomMessage);
-        } else {
-          // Staff and owners see operational notifications
-          const types = user.role === 'owner' 
-            ? ['order_update', 'table_update', 'kitchen_alert', 'customer_request'] as const
-            : ['order_update', 'table_update', 'customer_request'] as const;
-          
-          const randomType = types[Math.floor(Math.random() * types.length)];
-          
-          const messages = {
-            order_update: {
-              title: 'Order Update',
-              message: `Order #${Math.floor(Math.random() * 1000)} is ready for serving`
-            },
-            table_update: {
-              title: 'Table Status',
-              message: `Table ${Math.floor(Math.random() * 20) + 1} is now available`
-            },
-            kitchen_alert: {
-              title: 'Kitchen Alert',
-              message: 'Low stock alert for seasonal vegetables'
-            },
-            customer_request: {
-              title: 'Customer Request',
-              message: 'Table 5 requested extra napkins'
-            }
-          };
-
-          addNotification({
-            type: randomType,
-            ...messages[randomType]
-          });
-        }
-      }
-    }, 8000);
-
-    return () => clearInterval(interval);
+    
+    // Set up WebSocket or polling for real-time notifications
+    // This will be implemented when connected to actual backend events
+    
+    return () => {
+      // Cleanup
+    };
   }, [user]);
 
   return (

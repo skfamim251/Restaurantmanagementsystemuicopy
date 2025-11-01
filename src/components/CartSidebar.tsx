@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Plus, Minus, ShoppingCart, Trash2, MessageSquare, Edit3 } from "lucide-react";
+import { X, Plus, Minus, ShoppingCart, Trash2, MessageSquare, Edit3, MapPin } from "lucide-react";
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
@@ -136,7 +136,25 @@ export function CartSidebar({ isOpen, onClose, currentTable }: CartSidebarProps)
                     </p>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-6">
+                    {/* Show current table info if available */}
+                    {currentTable && (
+                      <div className="p-3 bg-primary/10 rounded-lg border border-primary/20">
+                        <div className="flex items-center space-x-2">
+                          <MapPin className="h-4 w-4 text-primary" />
+                          <div>
+                            <p className="text-sm font-medium text-primary">
+                              {currentTable.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Party of {currentTable.size}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
+                    <div className="space-y-4">
                     {cartItems.map((item) => (
                       <motion.div
                         key={item.id}
@@ -242,6 +260,7 @@ export function CartSidebar({ isOpen, onClose, currentTable }: CartSidebarProps)
                         </Card>
                       </motion.div>
                     ))}
+                  </div>
                   </div>
                 )}
               </div>

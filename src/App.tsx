@@ -5,6 +5,8 @@ import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
 import { Navigation } from "./components/Navigation";
 import { LoginForm } from "./components/LoginForm";
+import { LandingPage } from "./components/LandingPage";
+import { TenantRegistration } from "./components/TenantRegistration";
 import { Home } from "./components/Home";
 import { CustomerMenu } from "./components/CustomerMenu";
 import { KitchenDashboard } from "./components/KitchenDashboard";
@@ -21,10 +23,11 @@ import { isDemoMode } from "./utils/demoData";
 import * as api from "./utils/api";
 
 function AppContent() {
-  const [activeView, setActiveView] = useState("home");
+  const [activeView, setActiveView] = useState("landing");
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showTenantRegistration, setShowTenantRegistration] = useState(false);
   const { isAuthenticated, user } = useAuth();
 
   // Check if onboarding is needed
@@ -115,6 +118,33 @@ function AppContent() {
     }
   };
 
+  // Show landing page if not authenticated and on landing view
+  if (!isAuthenticated && activeView === "landing") {
+    return (
+      <LandingPage
+        onGetStarted={() => setShowTenantRegistration(true)}
+        onLogin={() => setActiveView("login")}
+      />
+    );
+  }
+
+  // Show tenant registration
+  if (!isAuthenticated && showTenantRegistration) {
+    return (
+      <TenantRegistration
+        onComplete={(tenantData) => {
+          setShowTenantRegistration(false);
+          setActiveView("login");
+        }}
+        onBack={() => {
+          setShowTenantRegistration(false);
+          setActiveView("landing");
+        }}
+      />
+    );
+  }
+
+  // Show login form
   if (!isAuthenticated) {
     return <LoginForm onSuccess={() => setActiveView("home")} />;
   }
